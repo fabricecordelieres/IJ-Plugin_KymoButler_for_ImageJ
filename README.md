@@ -96,4 +96,4 @@ For convenience, a plugin is provided that is able to decode the JSON file into 
 
 ## KymoButler\_for\_ImageJ and ImageJ/Fiji macros ?
 
-All the elements of this collection of plugins are macro-recordable !
+All the elements from this collection of plugins are macro-recordable !
