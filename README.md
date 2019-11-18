@@ -15,13 +15,13 @@ This plugin heavily relies on external libraries, that should be installed along
 
 ### Installing the plugin, the hard way:
 
-* Get the plugin from [here]() ancd place it in your plugins folder
+* Get the plugin from [here](https://github.com/fabricecordelieres/IJ-Plugin_KymoButler_for_ImageJ/releases/download/v1.0.0/KymoButler4IJ_.jar) and place it in your plugins folder
 * __commons-io, v2.6:__ follow this [link](https://www-eu.apache.org/dist//commons/io/binaries/commons-io-2.6-bin.zip), download the zip file, extract it, and place the _commons-io-2.6.jar_ file in your plugins folder.
 * __org.apache.httpcomponents/httpclient, v4.5.9:__ follow this [link](https://www-eu.apache.org/dist/httpcomponents/httpclient/binary/httpcomponents-client-4.5.9-bin.zip), download the zip file, extract it, and place the _commons-codec-1.11.jar_, _commons-logging-1.2.jar_, _httpclient-4.5.9.jar_, _httpcore-4.4.11.jar_ and _httpmime-4.5.9.jar_ files in your plugins folder.
 * __org.json/json, v20180813:__ follow this [link](https://github.com/stleary/JSON-java/archive/20180813.zip) download the zip file, extract it, compile it the place the __json-20180813.jar__ file in your plugins folder.
 
 ### Installing the plugin, the easy way:
-Get everything from [here](), unzip the file, don't worry about its content, and paste all its content into your plugins folder.
+Get everything from [here](https://github.com/fabricecordelieres/IJ-Plugin_KymoButler_for_ImageJ/releases/download/v1.0.0/KymoButler4IJ-and-friends_v1.zip), unzip the file, don't worry about its content, and paste all its content into your plugins folder.
 
 
 ## Setting-up the plugin
