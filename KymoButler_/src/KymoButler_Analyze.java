@@ -1,6 +1,6 @@
 /**
 *
-*  KymoButler_.java, 20 juil. 2019
+*  KymoButler_Analyze.java, 20 juil. 2019
    Fabrice P Cordelieres, fabrice.cordelieres at gmail.com
 
    Copyright (C) 2019 Fabrice P. Cordelieres
@@ -21,7 +21,6 @@
 *
 */
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,6 +31,7 @@ import ij.ImagePlus;
 import ij.Prefs;
 import ij.WindowManager;
 import ij.gui.GenericDialog;
+import ij.gui.WaitForUserDialog;
 import ij.measure.Calibration;
 import ij.plugin.PlugIn;
 
@@ -40,7 +40,7 @@ import ij.plugin.PlugIn;
  * @author Fabrice P. Cordelieres
  *
  */
-public class KymoButler_ implements PlugIn{
+public class KymoButler_Analyze implements PlugIn{
 	/** KymoButler API URL **/
 	String URL=Prefs.get("KymoButler_URL.string", "");
 	
@@ -71,21 +71,23 @@ public class KymoButler_ implements PlugIn{
 	/** Preferences: showKymo **/
 	boolean showKymo=Prefs.get("KymoButler_showKymo.boolean", true);
 	
-	/** Preferences: simplifyRois **/
+	/** Preferences: showOverlay **/
 	boolean showOverlay=Prefs.get("KymoButler_showOverlay.boolean", true);
+	
+	/** Preferences: allowCorrections **/
+	boolean allowCorrections=Prefs.get("KymoButler_allowCorrections.boolean", false);
 	
 	/** Debug tag: true to save JSON in IJ installation folder **/
 	boolean debug=Prefs.get("KymoButler_debug.boolean", false);
 	
-	String helpMsg="<html>Version 1.0.0, 13 aug. 2019<br>"
+	String helpMsg="<html>Version 1.0.0, 18 nov. 2019<br>"
 			+ "This plugin is powered by <a href=\"https://deepmirror.ai/software/kymobutler/\">KymoButler</a><br>"
 			+ "a webservice provided by Andrea Dimitracopoulos and Max Jakobs<br>"
-			+ "based on their <a href=\"https://www.biorxiv.org/content/10.1101/405183v3\">publication</a> you should cite when using the website/plugin:<br><br>"
-			+ "This plugin heavily relies on external libraries that are packed in its jar file:"
+			+ "based on their <a href=\"https://doi.org/10.7554/eLife.42288\">publication</a> you should cite when using the website/plugin:<br><br>"
+			+ "This plugin heavily relies on external libraries:"
 			+ "<ul>"
-			+ "	<li>commons-io, commons-io, v2.6</li>"
+			+ "	<li>commons-io, v2.6</li>"
 			+ "	<li>org.apache.httpcomponents/httpclient, v4.5.9</li>"
-			+ "	<li>org.apache.httpcomponents/httpmime, v4.5.9</li>"
 			+ "	<li>org.json/json, v20180813</li>"
 			+ "</ul>"
 			+ "<br><br>"
@@ -95,7 +97,7 @@ public class KymoButler_ implements PlugIn{
 	@Override
 	public void run(String arg) {
 		ip=WindowManager.getCurrentImage();
-		if(checkForLibraries()) {
+		if(KymoButlerIO.checkForLibraries()) {
 			if(!URL.isEmpty()) {	
 				if(ip!=null) {
 					showGUI();
@@ -110,43 +112,6 @@ public class KymoButler_ implements PlugIn{
 		}
 	}
 	
-	/**
-	 * Checks that the required libraries are installed, and displays an error message if they are not
-	 * @return true if all required libraries are installed, false otherwise
-	 */
-	public boolean checkForLibraries() {
-		/*
-		HashMap<String, String> classesToFind=new HashMap<String, String>(){
-			private static final long serialVersionUID = 1L;
-
-			{
-				put("commons-io-2.6", "org.apache.commons.io.FileUtils");
-				put("commons-logging-1.2", "org.apache.commons.logging.Log");
-				put("commons-codec-1.11", "org.apache.commons.codec.BinaryDecoder");
-				put("httpclient-4.5.9", "org.apache.http.client.HttpClient");
-				put("httpcore-4.4.11", "org.apache.http.HttpEntity");
-				put("httpmime-4.5.9", "org.apache.http.entity.mime.HttpMultipartMode");
-				put("json-20180813", "org.json.JSONObject");
-			}
-		};
-		*/
-		
-		String[] classesToFind=new String[] {"commons-io-2.6.jar", "commons-logging-1.2.jar", "commons-codec-1.11.jar", "httpclient-4.5.9.jar", "httpcore-4.4.11.jar", "httpmime-4.5.9.jar", "json-20180813.jar"};
-	
-		String msg="";
-		
-		for(String jar: classesToFind) {
-			boolean found=new File(IJ.getDirectory("plugins")+File.separator+"jars"+File.separator+jar).exists();
-			if(debug) IJ.log("Check "+jar+": "+(found?"":"not ")+"found");
-			
-			if(!found) msg=msg+(!msg.isEmpty()?"\n":"")+jar;
-		}
-		
-		if(!msg.isEmpty()) IJ.error("The following libraries are missing:\n"+msg);
-		
-		return msg.isEmpty();
-	}
-		
 	/**
 	 * Displays the GUI, stores the parameters and launches the analysis
 	 */
@@ -165,6 +130,7 @@ public class KymoButler_ implements PlugIn{
 		gd.addCheckbox("Clear manager before adding", clearManager);
 		gd.addCheckbox("Show_kymograph", showKymo);
 		gd.addCheckbox("Show_overlay", showOverlay);
+		gd.addCheckbox("Allow_corrections", allowCorrections);
 		
 		gd.addMessage("<html><p style=\"color:#FF0000\";><b><u>Note</u></b>: By using this plugin, you agree your image<br>"
 													  + "will be pushed to the <b>KymoButler</b> server and might<br>"
@@ -183,6 +149,7 @@ public class KymoButler_ implements PlugIn{
 			clearManager=gd.getNextBoolean();
 			showKymo=gd.getNextBoolean();
 			showOverlay=gd.getNextBoolean();
+			allowCorrections=gd.getNextBoolean();
 			
 			storePreferences();
 			
@@ -202,6 +169,7 @@ public class KymoButler_ implements PlugIn{
 		Prefs.set("KymoButler_clearManager.boolean", clearManager);
 		Prefs.set("KymoButler_showKymo.boolean", showKymo);
 		Prefs.set("KymoButler_showOverlay.boolean", showOverlay);
+		Prefs.set("KymoButler_allowCorrections.boolean", allowCorrections);
 	}
 	
 	/**
@@ -226,12 +194,36 @@ public class KymoButler_ implements PlugIn{
 					if(addToManager) pkr.pushRoisToRoiManager(simplifyTracks, clearManager);
 					if(showKymo) pkr.showKymograph(cal);
 					if(showOverlay) pkr.showOverlay(cal);
+					
+					if(addToManager && allowCorrections) {
+						WaitForUserDialog wfud= new WaitForUserDialog("Correct and re-train", "From the current detections list you may:"+"\n"
+																							+" \n"
+																							+ "1-Correct the detections:"+"\n"
+																							+ "    a-Click on the track to correct in the ROI Manager"+"\n"
+																							+ "    b-Modify the ROI on the image"+"\n"
+																							+ "    c-Click 'update' button in the ROI Manager"+"\n"
+																							+ "    d-Repeat for all tracks you want to modify"+"\n"
+																							+" \n"
+																							+ "2-Add detections:"+"\n"
+																							+ "    a-Activate the polyline tool"+"\n"
+																							+ "    b-Draw the missing track on the image"+"\n"
+																							+ "    c-Click 'add' button in the ROI Manager"+"\n"
+																							+ "    d-Repeat for all the missing tracks"+"\n"
+																							+" \n"
+																							+"Once done, please click on Ok"
+																							);
+						wfud.show();
+						new KymoButler_Upload().run(null);
+					}
+					
+					
+					if(debug && pkr.hasSomethingToLog()) IJ.log(pkr.getSomethingToLog());
 				}else {
 					IJ.showStatus("The response doesn't seem to be properly formatted");
 				}
 			}
 			
-			if(debug) kbio.saveAnalysisResults(IJ.getDirectory("imageJ")+(new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()))+"_debug_KymoButler.json");			
+			if(debug) kbio.saveResults(response, IJ.getDirectory("imageJ")+(new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()))+"_debug_KymoButler.json");			
 		}else {
 			IJ.showStatus("Nothing to do, please check at least one option");
 		}

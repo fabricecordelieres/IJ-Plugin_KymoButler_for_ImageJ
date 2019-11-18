@@ -71,7 +71,7 @@ public class KymoButler_JSON_parser implements PlugIn{
 	String helpMsg="<html>Version 1.0.0, 13 aug. 2019<br>"
 			+ "This plugin is powered by <a href=\"https://deepmirror.ai/software/kymobutler/\">KymoButler</a><br>"
 			+ "a webservice provided by Andrea Dimitracopoulos and Max Jakobs<br>"
-			+ "based on their <a href=\"https://www.biorxiv.org/content/10.1101/405183v3\">publication</a> you should cite when using the website/plugin:<br><br>"
+			+ "based on their <a href=\"https://doi.org/10.7554/eLife.42288\">publication</a> you should cite when using the website/plugin:<br><br>"
 			+ "This plugin heavily relies on external libraries that are packed in its jar file:"
 			+ "<ul>"
 			+ "	<li>commons-io, commons-io, v2.6</li>"

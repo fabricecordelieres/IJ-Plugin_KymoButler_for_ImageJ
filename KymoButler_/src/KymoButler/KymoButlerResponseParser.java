@@ -47,16 +47,6 @@ import ij.process.FloatPolygon;
  *
  */
 public class KymoButlerResponseParser {
-	/** Kymograph field tag **/
-	public static final String KYMOGRAPH_FIELD_TAG="Kymograph";
-	
-	/** Overlay field tag **/
-	public static final String OVERLAY_FIELD_TAG="overlay";
-	
-	/** Tracks field tag **/
-	public static final String TRACKS_FIELD_TAG="tracks";
-	
-
 	/** Stores the JSON content **/
 	JSONObject json=null;
 	
@@ -93,7 +83,7 @@ public class KymoButlerResponseParser {
 	 */
 	public static boolean isJSON(String JSONContent) {
 		return JSONContent.startsWith("{\n" + 
-				"	\"Kymograph\":");	
+				"	\"");	
 	}
 	
 	/**
@@ -101,7 +91,7 @@ public class KymoButlerResponseParser {
 	 * @return true if the kymograph data is present, false otherwise
 	 */
 	public boolean hasKymograph() {
-		return json.has(KYMOGRAPH_FIELD_TAG);
+		return json.has(KymoButlerFields.KYMOGRAPH_FIELD_TAG);
 	}
 	
 	/**
@@ -112,9 +102,9 @@ public class KymoButlerResponseParser {
 		JSONArray kymograph=null;
 		
 		try {
-			kymograph=json.getJSONArray(KYMOGRAPH_FIELD_TAG);
+			kymograph=json.getJSONArray(KymoButlerFields.KYMOGRAPH_FIELD_TAG);
 		}catch (JSONException e) {
-			IJ.log("The "+KYMOGRAPH_FIELD_TAG+" section was not found: please check the JSON file");
+			IJ.log("The "+KymoButlerFields.KYMOGRAPH_FIELD_TAG+" section was not found: please check the JSON file");
 			e.printStackTrace();
 			return null;
 		}
@@ -173,7 +163,7 @@ public class KymoButlerResponseParser {
 	 * @return true if the overlay data is present, false otherwise
 	 */
 	public boolean hasOverlay() {
-		return json.has(OVERLAY_FIELD_TAG);
+		return json.has(KymoButlerFields.OVERLAY_FIELD_TAG);
 	}
 	
 	/**
@@ -184,9 +174,9 @@ public class KymoButlerResponseParser {
 		JSONArray overlay=null;
 		
 		try {
-			overlay=json.getJSONArray(OVERLAY_FIELD_TAG);
+			overlay=json.getJSONArray(KymoButlerFields.OVERLAY_FIELD_TAG);
 		}catch (JSONException e) {
-			IJ.log("The "+OVERLAY_FIELD_TAG+" section was not found: please check the JSON file");
+			IJ.log("The "+KymoButlerFields.OVERLAY_FIELD_TAG+" section was not found: please check the JSON file");
 			return null;
 		}
 		
@@ -246,7 +236,7 @@ public class KymoButlerResponseParser {
 	 * @return true if the tracks data is present, false otherwise
 	 */
 	public boolean hasTracks() {
-		return json.has(TRACKS_FIELD_TAG);
+		return json.has(KymoButlerFields.TRACKS_FIELD_TAG);
 	}
 	
 	/**
@@ -258,9 +248,9 @@ public class KymoButlerResponseParser {
 		JSONArray tracks=null;
 		
 		try {
-			tracks=json.getJSONArray(TRACKS_FIELD_TAG);
+			tracks=json.getJSONArray(KymoButlerFields.TRACKS_FIELD_TAG);
 		}catch (JSONException e) {
-			IJ.log("The "+TRACKS_FIELD_TAG+" section was not found: please check the JSON file");
+			IJ.log("The "+KymoButlerFields.TRACKS_FIELD_TAG+" section was not found: please check the JSON file");
 			return null;
 		}
 		
@@ -339,6 +329,129 @@ public class KymoButlerResponseParser {
 		polygon.addPoint(points[points.length-1].getX(), points[points.length-1].getY());
 		
 		return new PolygonRoi(polygon, Roi.POLYLINE);
+	}
+	
+	
+	/**
+	 * Checks if the messages is present
+	 * @return true if the messages is present, false otherwise
+	 */
+	public boolean hasMessages() {
+		return json.has(KymoButlerFields.MESSAGES_FIELD_TAG);
+	}
+	
+	/**
+	 * Parses the messages field from the KymoButler response and returns its content as a String
+	 * @return the content of the messages field as a String, or null if the field was not found
+	 */
+	public String getMessages() {
+		return getStringField(KymoButlerFields.MESSAGES_FIELD_TAG);
+	}
+	
+	/**
+	 * Checks if the MaxKymographs field is present
+	 * @return true if the MaxKymographs is present, false otherwise
+	 */
+	public boolean hasMaxKymographs() {
+		return json.has(KymoButlerFields.MAX_KYMOGRAPHS_FIELD_TAG);
+	}
+	
+	/**
+	 * Parses the MaxKymographs field from the KymoButler response and returns its content as an integer
+	 * @return the content of the MaxKymographs field as an integer, or -1 if the field was not found
+	 */
+	public int getMaxKymographs() {
+		return getIntField(KymoButlerFields.MAX_KYMOGRAPHS_FIELD_TAG);
+	}
+	
+	/**
+	 * Checks if the KymographsLeft field is present
+	 * @return true if the KymographsLeft is present, false otherwise
+	 */
+	public boolean hasKymographsLeft() {
+		return json.has(KymoButlerFields.KYMOGRAPHS_LEFT_FIELD_TAG);
+	}
+	
+	/**
+	 * Parses the KymographsLeft field from the KymoButler response and returns its content as an integer
+	 * @return the content of the KymographsLeft field as an integer, or -1 if the field was not found
+	 */
+	public int getKymographsLeft() {
+		return getIntField(KymoButlerFields.KYMOGRAPHS_LEFT_FIELD_TAG);
+	}
+	
+	/**
+	 * Checks if the Version field is present
+	 * @return true if the Version is present, false otherwise
+	 */
+	public boolean hasVersion() {
+		return json.has(KymoButlerFields.VERSION_FIELD_TAG);
+	}
+	
+	/**
+	 * Parses the Version field from the KymoButler response and returns its content as a String
+	 * @return the content of the KymographsLeft field as an integer, or -1 if the field was not found
+	 */
+	public String getVersion() {
+		return getStringField(KymoButlerFields.VERSION_FIELD_TAG);
+	}
+	
+	/**
+	 * Checks if the Messages, KymographsLeft, MaxKymographs or Version fields is/are present
+	 * @return true if any of those fields is present, false otherwise
+	 */
+	public boolean hasSomethingToLog() {
+		return hasMessages() || hasKymographsLeft() || hasMaxKymographs() || hasVersion();
+	}
+	
+	/**
+	 * Parses the Messages, KymographsLeft, MaxKymographs and/or Version fields from the KymoButler response and returns its/their content as a String
+	 * @return the content of those fields as a String, empty String in case no field has been found
+	 */
+	public String getSomethingToLog() {
+		String out="";
+		if(hasMessages()) out+="Messages: "+getMessages();
+		if(hasKymographsLeft()) out+=(out==""?"":"\n")+"Kymographs left: "+getKymographsLeft();
+		if(hasMaxKymographs()) out+=(out==""?"":"\n")+"Max. kymographs: "+getMaxKymographs();
+		if(hasVersion()) out+=(out==""?"":"\n")+"API version: "+getVersion();
+		
+		return out;
+	}
+	
+	/**
+	 * Looks for the designated key in the KymoButler response and returns the field's content as a String
+	 * @param fieldKey The key to look for in the response
+	 * @return the extracted field as a String or null if the field was not found
+	 */
+	public String getStringField(String fieldKey) {
+		String fieldContent=null;
+		
+		try {
+			fieldContent=json.getString(fieldKey);;
+			return fieldContent;
+		}catch (JSONException e) {
+			IJ.log("The "+fieldKey+" section was not found: please check the JSON file");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	 * Looks for the designated key in the KymoButler response and returns the field's content as an integer
+	 * @param fieldKey The key to look for in the response
+	 * @return the extracted field as an integer or -1 if the field was not found
+	 */
+	public int getIntField(String fieldKey) {
+		int fieldContent=-1;
+		
+		try {
+			fieldContent=json.getInt(fieldKey);;
+			return fieldContent;
+		}catch (JSONException e) {
+			IJ.log("The "+fieldKey+" section was not found: please check the JSON file");
+			e.printStackTrace();
+			return -1;
+		}
 	}
 	
 	/**

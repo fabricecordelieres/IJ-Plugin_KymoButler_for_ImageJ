@@ -23,6 +23,7 @@
 
 package KymoButler;
 
+import java.awt.Polygon;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +47,8 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.Prefs;
 import ij.WindowManager;
+import ij.gui.Roi;
+import ij.plugin.frame.RoiManager;
 
 /**
  * This class is aimed at pushing a kymograph to the KymoButler cloud, and retrieving both an image with tracks overlayed 
@@ -69,6 +72,9 @@ public class KymoButlerIO{
 	//Parameter minimumFrames, default value 3
 	String minimumFrames="3";
 	
+	//Parameter tracks, default null
+	String tracks=null;
+	
 	//Parameter simplifyTracks, default value true
 	boolean simplifyTracks=true;
 	
@@ -89,6 +95,10 @@ public class KymoButlerIO{
 	
 	/** Keeps track of the user pressing the escape key: will cancel all the process **/
 	boolean escPressed=false;
+	
+	/** Debug tag: true to save JSON in IJ installation folder **/
+	static boolean debug=Prefs.get("KymoButler_debug.boolean", false);
+	
 	
 	
 	
@@ -220,16 +230,76 @@ public class KymoButlerIO{
 	}
 	
 	/**
+	 * Extracts the rois from the ROI Manager as a JSON segment and stores them for further analysis
+	 */
+	public void setTracks() {
+		tracks=roiManagerToJSON();
+	}
+	
+	/**
+	 * Converts the ROIs set to a JSON segment and stores them for further analysis
+	 * @param rois the ROIs set to convert
+	 */
+	public void setTracks(Roi[] rois) {
+		tracks=roiSetToJSON(rois);
+	}
+	
+	/**
+	 * Returns the content of the ROI Manager as a String, JSON formatted segment 
+	 */
+	public String getTracks() {
+		return tracks;
+	}
+	
+	/**
+	 * Requests the server to send back some usage statistics about the KymoButler API
+	 * @return a String JSON formatted, containing the response (messages, MaxKymograph, KymographsLeft)
+	 */
+	public String getStatistics() {
+		MultipartEntityBuilder builder=MultipartEntityBuilder.create()
+				.setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+				.addTextBody(KymoButlerFields.QUERY_FIELD_TAG, KymoButlerFields.QUERY_STATS_FIELD_TAG);
+		HttpEntity multiPartEntity = builder.build();
+		
+		httpPost = new HttpPost(URL);
+		httpPost.setEntity(multiPartEntity);
+		
+		HttpClient client = HttpClientBuilder.create().build();
+		startTime=System.currentTimeMillis();
+		
+		showMessage();
+		
+		
+		try {
+			response=client.execute(httpPost);
+			
+			IJ.showStatus("Informations retrieved in "+getElapsedTime());
+			
+			String out=EntityUtils.toString(response.getEntity(), "UTF-8");
+			
+			httpPost.releaseConnection();
+			
+			return out;
+		
+		} catch (IOException e) {
+			IJ.log("Something went wrong while sending the request/getting the response to/from the server");
+			//e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
 	 * Pushes the image data and parameters to the KymoButler webapp.
 	 * @return a String JSON formatted, containing the response (two images, kymograph and overlay, and the tracks as a CSV-style file)
 	 */
 	public String getAnalysisResults() {
 		MultipartEntityBuilder builder=MultipartEntityBuilder.create()
 				.setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-				.addBinaryBody("Kymograph", img)
-				.addTextBody("p", p)
-				.addTextBody("minimumSize", minimumSize)
-				.addTextBody("minimumFrames", minimumFrames);
+				.addTextBody(KymoButlerFields.QUERY_FIELD_TAG, KymoButlerFields.QUERY_ANALYSIS_FIELD_TAG)
+				.addBinaryBody(KymoButlerFields.KYMOGRAPH_FIELD_TAG, img)
+				.addTextBody(KymoButlerFields.THRESHOLD_FIELD_TAG, p)
+				.addTextBody(KymoButlerFields.MINIMUM_SIZE_FIELD_TAG, minimumSize)
+				.addTextBody(KymoButlerFields.MINIMUM_FRAMES_FIELD_TAG, minimumFrames);
 		HttpEntity multiPartEntity = builder.build();
 		
 		httpPost = new HttpPost(URL);
@@ -246,11 +316,44 @@ public class KymoButlerIO{
 			
 			IJ.showStatus("Analysis performed in "+getElapsedTime());
 			
-			//HttpEntity entity = response.getEntity();
-			//String responseString = EntityUtils.toString(entity);//, "UTF-8");
+			String out=EntityUtils.toString(response.getEntity(), "UTF-8");
 			
-			//JSONObject result=new JSONObject(responseString);
-			//return result.toString();
+			httpPost.releaseConnection();
+			
+			return out;
+		
+		} catch (IOException e) {
+			IJ.log("Something went wrong while sending the request/getting the response to/from the server");
+			//e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Pushes the image data and the tracks to the KymoButler webapp to correct and retrain the network.
+	 * @return a String JSON formatted, containing the response
+	 */
+	public String upload() {
+		MultipartEntityBuilder builder=MultipartEntityBuilder.create()
+				.setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+				.addTextBody(KymoButlerFields.QUERY_FIELD_TAG, KymoButlerFields.QUERY_UPLOAD_FIELD_TAG)
+				.addBinaryBody(KymoButlerFields.KYMOGRAPH_FIELD_TAG, img)
+				.addTextBody(KymoButlerFields.TRACKS_FIELD_TAG, tracks);
+		HttpEntity multiPartEntity = builder.build();
+		
+		httpPost = new HttpPost(URL);
+		httpPost.setEntity(multiPartEntity);
+		
+		HttpClient client = HttpClientBuilder.create().build();
+		startTime=System.currentTimeMillis();
+		
+		showMessage();
+		
+		
+		try {
+			response=client.execute(httpPost);
+			
+			IJ.showStatus("Upload performed in "+getElapsedTime());
 			
 			String out=EntityUtils.toString(response.getEntity(), "UTF-8");
 			
@@ -265,15 +368,14 @@ public class KymoButlerIO{
 		return null;
 	}
 	
-	
 	/**
-	 * Pushes the image data and parameters to the KymoButler webapp, and saves the JSON response to a file
+	 * Save a string to a file
+	 * @param content the String content to save
 	 * @param outputPath path to the file where the JSON content will be saved
 	 */
-	public void saveAnalysisResults(String outputPath) {
-		String  results=getAnalysisResults();
+	public void saveResults(String content, String outputPath) {
 		try {
-			FileUtils.writeStringToFile(new File(outputPath), results, "UTF-8");
+			FileUtils.writeStringToFile(new File(outputPath), content, "UTF-8");
 		} catch (IOException e) {
 			IJ.log("Something went wrong while saving the analysis results to the provided path "+outputPath);
 			e.printStackTrace();
@@ -290,10 +392,10 @@ public class KymoButlerIO{
 				while(response==null && !escPressed && (System.currentTimeMillis()-startTime)<timeOut) {
 					
 					if(!IJ.escapePressed()) {
-						IJ.showStatus("Analysis started "+getElapsedTime()+" ago, waiting for response");
+						IJ.showStatus("Process started "+getElapsedTime()+" ago, waiting for response");
 					}else {
 						httpPost.abort();
-						IJ.showStatus("Analysis cancelled");
+						IJ.showStatus("Process cancelled");
 						escPressed=true;
 					}
 					try {
@@ -318,5 +420,80 @@ public class KymoButlerIO{
 		Date elapsedTime=new Date(System.currentTimeMillis()-startTime);
 		SimpleDateFormat sdf=new SimpleDateFormat("mm:ss");
 		return sdf.format(elapsedTime);
+	}
+	
+	/**
+	 * Encodes the input Roi as a JSON segment
+	 * “{{{track1_t1,track1_x1},{track1_t2,track1_x2},{track1_t3,track1_x3},...},{{track2_t1,track2_x1},{track2_t2,track2_x2},{track2_t3,track2_x3},...},…}” 
+	 * @param roi the input Roi
+	 * @return a String containing the Roi's coordinates encoded as a JSON segment
+	 */
+	private String roiToJSON(Roi roi) {
+		String out="{";
+		Polygon pol=roi.getPolygon();
+		
+		for(int i=0; i<pol.npoints; i++) out+="{"+pol.ypoints[i]+","+pol.xpoints[i]+"}"+(i!=pol.npoints-1?",":"}");
+		
+		return out;
+	}
+	
+	/**
+	 * Encodes the input ROIs set as a JSON segment
+	 * “{{{track1_t1,track1_x1},{track1_t2,track1_x2},{track1_t3,track1_x3},...},{{track2_t1,track2_x1},{track2_t2,track2_x2},{track2_t3,track2_x3},...},…}” 
+	 * @param rois the ROIs set to convert
+	 * @return a String containing the Roi's coordinates encoded as a JSON segment
+	 */
+	private String roiSetToJSON(Roi[] rois) {
+		String out="{";
+		
+		for(int i=0; i<rois.length; i++) out+=roiToJSON(rois[i])+(i!=rois.length-1?",":"}");
+		
+		return out;
+	}
+	
+	/**
+	 * Encodes the content of the RoiManager as a JSON segment
+	 * “{{{track1_t1,track1_x1},{track1_t2,track1_x2},{track1_t3,track1_x3},...},{{track2_t1,track2_x1},{track2_t2,track2_x2},{track2_t3,track2_x3},...},…}” 
+	 * @return a String containing the Roi's coordinates encoded as a JSON segment
+	 */
+	private String roiManagerToJSON() {
+		return roiSetToJSON(RoiManager.getRoiManager().getRoisAsArray());
+	}
+	
+	/**
+	 * Checks that the required libraries are installed, and displays an error message if they are not
+	 * @return true if all required libraries are installed, false otherwise
+	 */
+	public static boolean checkForLibraries() {
+		/*
+		HashMap<String, String> classesToFind=new HashMap<String, String>(){
+			private static final long serialVersionUID = 1L;
+
+			{
+				put("commons-io-2.6", "org.apache.commons.io.FileUtils");
+				put("commons-logging-1.2", "org.apache.commons.logging.Log");
+				put("commons-codec-1.11", "org.apache.commons.codec.BinaryDecoder");
+				put("httpclient-4.5.9", "org.apache.http.client.HttpClient");
+				put("httpcore-4.4.11", "org.apache.http.HttpEntity");
+				put("httpmime-4.5.9", "org.apache.http.entity.mime.HttpMultipartMode");
+				put("json-20180813", "org.json.JSONObject");
+			}
+		};
+		*/
+		
+		String[] classesToFind=new String[] {"commons-io-2.6.jar", "commons-logging-1.2.jar", "commons-codec-1.11.jar", "httpclient-4.5.9.jar", "httpcore-4.4.11.jar", "httpmime-4.5.9.jar", "json-20180813.jar"};
+	
+		String msg="";
+		
+		for(String jar: classesToFind) {
+			boolean found=new File(IJ.getDirectory("plugins")+File.separator+"jars"+File.separator+jar).exists();
+			if(debug) IJ.log("Check "+jar+": "+(found?"":"not ")+"found");
+			
+			if(!found) msg=msg+(!msg.isEmpty()?"\n":"")+jar;
+		}
+		
+		if(!msg.isEmpty()) IJ.error("The following libraries are missing:\n"+msg);
+		
+		return msg.isEmpty();
 	}
 }
