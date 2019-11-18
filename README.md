@@ -93,3 +93,7 @@ In addition, when the debug mode is activated, any communication from the server
 
 For convenience, a plugin is provided that is able to decode the JSON file into image, tracks and messages: __KymoButler for ImageJ/KymoButler JSON Parser__.
 
+
+## KymoButler\_for\_ImageJ and ImageJ/Fiji macros ?
+
+All the elements of this collection of plugins are macro-recordable !
