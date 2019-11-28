@@ -6,6 +6,8 @@ This plugin doesn't do any processing per-se: its aim is to provide an easy to u
 
 Please note that your data will be sent to the KymoButler servers and might be used to improve the algorithms . Although the data is anonymized, this point is worth noticing !
 
+No commercial interest here, but you can get a free trial of the KymoButler API (25 free uses) by registering [here](https://deepmirror.ai/KymoButler/getAPI) through their webform.
+
 ## Installing the plugin
 This plugin heavily relies on external libraries, that should be installed alongside the plugin:
 
@@ -31,7 +33,7 @@ To use the plugin, you will first need to get an register from [KymoButler](http
 
 Parameters:
 
-* _KymoButler API URL:_ The URL provided by [KymoButler](https://deepmirror.ai/software/kymobutler/).
+* _KymoButler API URL:_ The URL provided by [KymoButler](https://deepmirror.ai/software/kymobutler/). You can get a free trial of the KymoButler API (25 free uses) by registering [here](https://deepmirror.ai/KymoButler/getAPI) through their webform.
 * _Server timeout:_ The maximum time the plugin will wait for a response from the server before cancelling the process.
 * _Debug mode:_ Allows debugging possible communication issues with the server (see the [Debug options and tools](#debug-options-and-tools) section).
 
