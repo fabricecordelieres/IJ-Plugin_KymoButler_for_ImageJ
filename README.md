@@ -6,7 +6,7 @@ This plugin doesn't do any processing per-se: its aim is to provide an easy to u
 
 Please note that your data will be sent to the KymoButler servers and might be used to improve the algorithms . Although the data is anonymized, this point is worth noticing !
 
-No commercial interest here, but you can get a free trial of the KymoButler API (25 free uses) by registering [here](https://deepmirror.ai/KymoButler/getAPI) through their webform.
+No commercial interest here, but the API that comes with this software is limited by default to restrict image size, computation time, and batch processing. Contact [deepMirror](https://deepmirror.ai), the company that runs the API, for access to an unrestricted API (charges apply).
 
 ## Installing the plugin
 This plugin heavily relies on external libraries, that should be installed alongside the plugin:
@@ -27,13 +27,12 @@ Get everything from [here](https://github.com/fabricecordelieres/IJ-Plugin_KymoB
 
 
 ## Setting-up the plugin
-To use the plugin, you will first need to get an register from [KymoButler](https://deepmirror.ai/software/kymobutler/). They provide pay-per-use access to their API. Once registered, you'll be provided with an API link to be entered under __Plugins/KymoButler for ImageJ/KymoButler Options__:
 
 ![KymoButler_Options](img/KymoButler_Options.png)
 
 Parameters:
 
-* _KymoButler API URL:_ The URL provided by [KymoButler](https://deepmirror.ai/software/kymobutler/). You can get a free trial of the KymoButler API (25 free uses) by registering [here](https://deepmirror.ai/KymoButler/getAPI) through their webform.
+* _KymoButler API URL:_ The URL provided by [KymoButler](https://deepmirror.ai/software/kymobutler/). The default API restricts image size, computation time, and batch processing.
 * _Server timeout:_ The maximum time the plugin will wait for a response from the server before cancelling the process.
 * _Debug mode:_ Allows debugging possible communication issues with the server (see the [Debug options and tools](#debug-options-and-tools) section).
 
