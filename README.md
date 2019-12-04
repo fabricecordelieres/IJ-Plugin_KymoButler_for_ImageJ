@@ -33,6 +33,7 @@ Get everything from [here](https://github.com/fabricecordelieres/IJ-Plugin_KymoB
 Parameters:
 
 * _KymoButler API URL:_ The URL provided by [KymoButler](https://deepmirror.ai/software/kymobutler/). The default API restricts image size, computation time, and batch processing.
+* _Use default API ? (Limited but free)_: This will use a fully free API that has some limitations in terms of batch processing, pixel number, and CPU time.
 * _Server timeout:_ The maximum time the plugin will wait for a response from the server before cancelling the process.
 * _Debug mode:_ Allows debugging possible communication issues with the server (see the [Debug options and tools](#debug-options-and-tools) section).
 
