@@ -31,6 +31,12 @@ import ij.plugin.PlugIn;
  *
  */
 public class KymoButler_Options implements PlugIn{
+	/** KymoButler default API **/
+	public static final String DEFAULT_API="https://www.wolframcloud.com/obj/deepmirror/Projects/KymoButler/API/Public/publicAPI ";
+	
+	/** Use default API ? **/
+	boolean useDefaultAPI=Prefs.get("KymoButler_useDefaultAPI.boolean", true);
+	
 	/** KymoButler API URL **/
 	String URL=Prefs.get("KymoButler_URL.string", "");
 	
@@ -47,12 +53,14 @@ public class KymoButler_Options implements PlugIn{
 	public void run(String arg) {
 		GenericDialog gd=new GenericDialog("KymoButler for IJ options by fabrice.cordelieres@gmail.com");
 		gd.addStringField("KymoButler_API_URL", URL);
+		gd.addCheckbox("User_default_API_?_(Limited_but_free)", useDefaultAPI);
 		gd.addNumericField("Server_timeout (default: 120 sec)", timeOut/1000, 0);
 		gd.addCheckbox("Debug_mode (default: false)", debug);
 		gd.showDialog();
 		
 		if(gd.wasOKed()) {
 			URL=gd.getNextString();
+			useDefaultAPI=gd.getNextBoolean();
 			timeOut=(long) (gd.getNextNumber()*1000);
 			debug=gd.getNextBoolean();
 			
@@ -64,9 +72,10 @@ public class KymoButler_Options implements PlugIn{
 	 * Stores preferences, based on the user input
 	 */
 	public void storePreferences() {
+		if(useDefaultAPI) URL=DEFAULT_API;
 		Prefs.set("KymoButler_URL.string", URL);
+		Prefs.set("KymoButler_useDefaultAPI.boolean", useDefaultAPI);
 		Prefs.set("KymoButler_timeOut.double", timeOut);
 		Prefs.set("KymoButler_debug.boolean", debug);
 	}
-
 }
