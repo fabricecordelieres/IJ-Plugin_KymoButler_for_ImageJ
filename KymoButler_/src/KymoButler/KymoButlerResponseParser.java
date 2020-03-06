@@ -95,6 +95,15 @@ public class KymoButlerResponseParser {
 	}
 	
 	/**
+	 * Checks if error returned
+	 * @return true if error  present, false otherwise
+	 */
+	public boolean hasError() {
+		return json.has(KymoButlerFields.ERROR_FIELD_TAG);
+	}
+	
+	
+	/**
 	 * Parses the kymograph field from the KymoButler response and returns an ImageJ ImagePlus
 	 * @return the extracted kymograph as an ImagePlus or null if the field was not found
 	 */

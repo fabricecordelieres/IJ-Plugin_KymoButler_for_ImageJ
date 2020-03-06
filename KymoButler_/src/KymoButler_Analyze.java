@@ -191,12 +191,21 @@ public class KymoButler_Analyze implements PlugIn{
 			}else {
 				if(KymoButlerResponseParser.isJSON(response)){
 					KymoButlerResponseParser pkr=new KymoButlerResponseParser(response);
-					if(addToManager) pkr.pushRoisToRoiManager(simplifyTracks, clearManager);
-					if(showKymo) pkr.showKymograph(cal);
-					if(showOverlay) pkr.showOverlay(cal);
+
+					/** Check if KB returns an error before running parsing*/
+					if(pkr.hasError()){
+						if(pkr.hasMessages()){ 
+							IJ.log(pkr.getMessages());
+						}else{
+							IJ.log("Undefined Error!");	
+						}		
+					}else{	
+						if(addToManager) pkr.pushRoisToRoiManager(simplifyTracks, clearManager);
+						if(showKymo) pkr.showKymograph(cal);
+						if(showOverlay) pkr.showOverlay(cal);
 					
-					if(addToManager && allowCorrections) {
-						WaitForUserDialog wfud= new WaitForUserDialog("Correct and re-train", "From the current detections list you may:"+"\n"
+						if(addToManager && allowCorrections) {
+							WaitForUserDialog wfud= new WaitForUserDialog("Correct and re-train", "From the current detections list you may:"+"\n"
 																							+" \n"
 																							+ "1-Correct the detections:"+"\n"
 																							+ "    a-Click on the track to correct in the ROI Manager"+"\n"
@@ -212,12 +221,13 @@ public class KymoButler_Analyze implements PlugIn{
 																							+" \n"
 																							+"Once done, please click on Ok"
 																							);
-						wfud.show();
-						new KymoButler_Upload().run(null);
+							wfud.show();
+							new KymoButler_Upload().run(null);
+						}
+					
+					
+						if(debug && pkr.hasSomethingToLog()) IJ.log(pkr.getSomethingToLog());
 					}
-					
-					
-					if(debug && pkr.hasSomethingToLog()) IJ.log(pkr.getSomethingToLog());
 				}else {
 					IJ.showStatus("The response doesn't seem to be properly formatted");
 				}

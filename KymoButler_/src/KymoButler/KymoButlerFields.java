@@ -46,6 +46,9 @@ public class KymoButlerFields {
 	/** Messages field tag **/
 	public static final String MESSAGES_FIELD_TAG="messages";
 	
+	/** Error field tag **/
+	public static final String ERROR_FIELD_TAG="error";
+	
 	/** Total number of kymographs in the API field tag **/
 	public static final String MAX_KYMOGRAPHS_FIELD_TAG="MaxKymographs";
 	
