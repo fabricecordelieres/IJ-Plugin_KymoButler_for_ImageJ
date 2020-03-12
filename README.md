@@ -23,7 +23,7 @@ This plugin heavily relies on external libraries, which should be installed alon
 * __org.json/json, v20180813:__ follow this [link](https://github.com/stleary/JSON-java/archive/20180813.zip) download the zip file, extract it, compile it the place the __json-20180813.jar__ file in your plugins folder.
 
 ### Installing the plugin, the easy way:
-Get everything from [here](https://github.com/fabricecordelieres/IJ-Plugin_KymoButler_for_ImageJ/releases/download/v1.1.0/KymoButler4IJ-and-friends_v1.1.zip), unzip the file, and paste all its content into your plugins folder.
+Get everything from [here](https://github.com/fabricecordelieres/IJ-Plugin_KymoButler_for_ImageJ/releases/download/v1.1.1/KymoButler4IJ-and-friends_v1.1.1.zip), unzip the file, and paste all its content into your plugins folder.
 
 
 ## Setting-up the plugin
