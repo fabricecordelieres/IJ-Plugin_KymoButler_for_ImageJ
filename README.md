@@ -1,6 +1,7 @@
 # KymoButler for ImageJ
 > [!IMPORTANT]
 > __Update, 13/09/2024:__
+> 
 > The ability to call the DeepMirror/KymoButler through API has recently been discontinued.
 > As a consequence, this plugin is not functional anymore.
 > No information is currently available about if and/or when the service will be back online.
