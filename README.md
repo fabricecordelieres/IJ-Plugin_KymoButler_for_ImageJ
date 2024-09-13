@@ -1,11 +1,8 @@
 # KymoButler for ImageJ
-```html
-<span style="color: red">Update, 13/09/2024:
+$${\color{red}Update, 13/09/2024:
 The ability to call the DeepMirror/KymoButler through API has recently been discontinued.
 As a consequence, this plugin is not functional anymore.
-No information is currently available about if and/or when the service will be back online.
-</span>
-```
+No information is currently available about if and/or when the service will be back online.}$$
 
 ## Before we start
 This plugin doesn't do any processing per-se: its aim is to provide an easy-to-use interface between ImageJ/Fiji and the [KymoButler](https://deepmirror.ai/software/kymobutler/) cloud-application. It allows pushing kymographs obtained using a dedicated tool (please consider using [KymoToolBox](https://github.com/fabricecordelieres/IJ-Plugin_KymoToolBox)) from ImageJ/Fiji to the KymoButler servers.
